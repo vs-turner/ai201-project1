@@ -82,10 +82,7 @@ def fallback_split(
 
 def split_documents(documents: list[Document]) -> list[Chunk]:
     """
-    Split documents into chunks. ⚠️ REPLACE THE BODY OF THIS IN MILESTONE 3.
-
-    Right now it just calls the fallback. That is the plain, generic behaviour
-    the brief is talking about.
+    Split documents into chunks using 6 lines, as demarcated by newline chars.
 
     When you write your own strategy, set `produced_by` to
     "chunker.py::split_documents" so your README's Sample Chunks section names
@@ -97,7 +94,30 @@ def split_documents(documents: list[Document]) -> list[Chunk]:
       - Would splitting on paragraph breaks keep more thoughts intact than
         splitting on a character count?
     """
-    return fallback_split(documents)
+
+    lines_per_chunk = 6
+
+    #if overlap >= chunk_size:
+    #    raise ValueError("overlap has to be smaller than chunk_size")
+
+    chunks: list[Chunk] = []
+    for doc in documents:
+        lines = doc.text.split("\n") # split one string per line
+        index = 0
+        for i in range(0, len(lines), lines_per_chunk):
+            piece = "\n".join(lines[i : i + lines_per_chunk]).strip()
+            if piece:
+                chunks.append(
+                    Chunk(
+                        text=piece,
+                        source=doc.source,
+                        index=index,
+                        produced_by="chunker.py::split_documents",
+                    )
+                )
+                index += 1
+
+    return chunks
 
 
 def describe(chunks: list[Chunk]) -> str:
